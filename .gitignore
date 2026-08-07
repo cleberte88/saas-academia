@@ -1,0 +1,25 @@
+# Dependências
+node_modules/
+.pnp
+.pnp.js
+
+# Expo / React Native
+.expo/
+*.jks
+*.p8
+*.mobileprovision
+
+# Next.js
+.next/
+out/
+
+# Arquivos de ambiente (NUNCA suba as senhas do Supabase)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs e Misc
+*.log
+.DS_Store
