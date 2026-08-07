@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "name": "Academia App",
+    "slug": "academia-app",
+    "scheme": "academiaapp",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.suaempresa.academiaapp"
+    },
+    "android": {
+      "package": "com.suaempresa.academiaapp"
+    },
+    "plugins": ["expo-router"]
+  }
+}
