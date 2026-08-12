@@ -53,7 +53,9 @@ export default async function AlunosPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button className="text-blue-600 hover:text-blue-800 font-medium">Editar</button>
+                        <Link href={`/alunos/${aluno.id}`} className="text-blue-600 hover:text-blue-800 font-medium">
+                            Editar
+                        </Link>
                     </td>
                   </tr>
                 ))
