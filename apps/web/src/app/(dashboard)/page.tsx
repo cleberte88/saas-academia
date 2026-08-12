@@ -1,9 +1,23 @@
-export default function DashboardPage() {
+import { createClient } from '@/lib/supabase/server'
+
+export default async function DashboardPage() {
+  // 1. Conecta com o Supabase
+  const supabase = await createClient()
+
+  // 2. Busca apenas a CONTAGEM de alunos que estão com o status 'Ativo'
+  // O Supabase é inteligente: graças às regras de segurança (RLS), 
+  // ele só vai contar os alunos da sua própria academia!
+  const { count: totalAlunos } = await supabase
+    .from('alunos')
+    .select('*', { count: 'exact', head: true })
+    .eq('status', 'Ativo')
+
+  // 3. Atualizamos a nossa lista de KPIs com o dado real
   const kpis = [
-    { label: 'Alunos Ativos', value: '142', trend: '+12% este mês', color: 'text-emerald-600', bg: 'bg-emerald-50' },
-    { label: 'Check-ins Hoje', value: '89', trend: 'Faltam 14 para a meta', color: 'text-blue-600', bg: 'bg-blue-50' },
-    { label: 'Receita do Mês', value: 'R$ 14.500', trend: '+5% em relação ao mês passado', color: 'text-violet-600', bg: 'bg-violet-50' },
-    { label: 'Contratos a Vencer', value: '12', trend: 'Nos próximos 7 dias', color: 'text-rose-600', bg: 'bg-rose-50' },
+    { label: 'Alunos Ativos', value: totalAlunos || 0, trend: 'Atualizado agora', color: 'text-emerald-600', bg: 'bg-emerald-50' },
+    { label: 'Check-ins Hoje', value: '0', trend: 'Em breve', color: 'text-blue-600', bg: 'bg-blue-50' },
+    { label: 'Receita do Mês', value: 'R$ 0', trend: 'Em breve', color: 'text-violet-600', bg: 'bg-violet-50' },
+    { label: 'Contratos a Vencer', value: '0', trend: 'Em breve', color: 'text-rose-600', bg: 'bg-rose-50' },
   ]
 
   return (
