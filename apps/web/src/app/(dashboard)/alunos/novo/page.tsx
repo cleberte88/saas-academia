@@ -35,7 +35,8 @@ export default function NovoAlunoPage() {
 
       if (!profile?.academia_id) throw new Error('Academia não encontrada')
 
-      const { error: insertError } = await supabase
+      // 1. Salva o aluno e PEDE O RETORNO DOS DADOS (.select().single())
+      const { data: novoAluno, error: insertError } = await supabase
         .from('alunos')
         .insert([
           {
@@ -45,12 +46,43 @@ export default function NovoAlunoPage() {
             status: 'Ativo',
             cpf,
             telefone,
-            data_nascimento: dataNascimento || null, // manda null se estiver vazio
+            data_nascimento: dataNascimento || null,
             academia_id: profile.academia_id
           }
         ])
+        .select()
+        .single()
 
       if (insertError) throw insertError
+
+      // 2. Lógica Financeira: Define um valor base para cada plano
+      let valorMensalidade = 0
+      if (plano === 'Mensal') valorMensalidade = 120.00
+      if (plano === 'Trimestral') valorMensalidade = 300.00 // 100/mês
+      if (plano === 'Semestral') valorMensalidade = 540.00 // 90/mês
+      if (plano === 'Anual') valorMensalidade = 960.00 // 80/mês
+
+      // Pega a data de hoje no formato YYYY-MM-DD
+      const dataHoje = new Date().toISOString().split('T')[0]
+
+      // 3. Gera a primeira cobrança na tabela de mensalidades
+      const { error: financeiroError } = await supabase
+        .from('mensalidades')
+        .insert([
+          {
+            aluno_id: novoAluno.id,
+            academia_id: profile.academia_id,
+            valor: valorMensalidade,
+            data_vencimento: dataHoje,
+            status: 'Pendente'
+          }
+        ])
+
+      if (financeiroError) {
+        // Se falhar a mensalidade, avisamos mas não travamos o aluno
+        console.error('Erro ao gerar mensalidade:', financeiroError)
+        throw new Error('Aluno salvo, mas ocorreu um erro ao gerar a cobrança.')
+      }
 
       router.push('/alunos')
       router.refresh()
@@ -62,6 +94,7 @@ export default function NovoAlunoPage() {
     }
   }
 
+  // ... O RESTO DO COMPONENTE CONTINUA IGUAL (return com o HTML) ...
   return (
     <div className="max-w-3xl mx-auto">
       <div className="mb-6 flex items-center justify-between">

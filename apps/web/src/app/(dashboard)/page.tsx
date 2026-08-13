@@ -1,22 +1,39 @@
 import { createClient } from '@/lib/supabase/server'
 
 export default async function DashboardPage() {
-  // 1. Conecta com o Supabase
   const supabase = await createClient()
 
-  // 2. Busca apenas a CONTAGEM de alunos que estão com o status 'Ativo'
-  // O Supabase é inteligente: graças às regras de segurança (RLS), 
-  // ele só vai contar os alunos da sua própria academia!
+  // 1. Busca total de alunos ativos (que já tínhamos feito)
   const { count: totalAlunos } = await supabase
     .from('alunos')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'Ativo')
 
-  // 3. Atualizamos a nossa lista de KPIs com o dado real
+  // 2. Lógica Financeira: Descobre o primeiro dia do mês atual
+  const hoje = new Date()
+  const primeiroDiaDoMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1).toISOString().split('T')[0]
+
+  // 3. Busca todas as mensalidades pagas neste mês
+  const { data: mensalidadesPagas } = await supabase
+    .from('mensalidades')
+    .select('valor')
+    .eq('status', 'Pago')
+    .gte('data_pagamento', primeiroDiaDoMes) // gte = Greater Than or Equal (Maior ou igual ao 1º dia do mês)
+
+  // 4. Soma todos os valores encontrados
+  const receitaTotal = mensalidadesPagas?.reduce((soma, item) => soma + Number(item.valor), 0) || 0
+
+  // 5. Formata o valor para Reais (R$)
+  const receitaFormatada = new Intl.NumberFormat('pt-BR', { 
+    style: 'currency', 
+    currency: 'BRL' 
+  }).format(receitaTotal)
+
+  // Atualizamos a nossa lista de KPIs
   const kpis = [
     { label: 'Alunos Ativos', value: totalAlunos || 0, trend: 'Atualizado agora', color: 'text-emerald-600', bg: 'bg-emerald-50' },
     { label: 'Check-ins Hoje', value: '0', trend: 'Em breve', color: 'text-blue-600', bg: 'bg-blue-50' },
-    { label: 'Receita do Mês', value: 'R$ 0', trend: 'Em breve', color: 'text-violet-600', bg: 'bg-violet-50' },
+    { label: 'Receita do Mês', value: receitaFormatada, trend: 'Atualizado agora', color: 'text-violet-600', bg: 'bg-violet-50' },
     { label: 'Contratos a Vencer', value: '0', trend: 'Em breve', color: 'text-rose-600', bg: 'bg-rose-50' },
   ]
 

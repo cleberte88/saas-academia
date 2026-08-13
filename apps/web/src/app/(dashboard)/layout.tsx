@@ -30,13 +30,16 @@ export default async function DashboardLayout({ children }: { children: React.Re
               <strong className="text-xl font-bold text-slate-900 tracking-tight">SaaS Academias</strong>
             </div>
             
-            {/* NOVO: Menu de Navegação */}
+            {/* NOVO: Menu de Navegação Atualizado */}
             <nav className="hidden md:flex gap-6">
               <Link href="/" className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">
                 Visão Geral
               </Link>
               <Link href="/alunos" className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">
                 Alunos
+              </Link>
+              <Link href="/financeiro" className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">
+                Financeiro
               </Link>
             </nav>
 
