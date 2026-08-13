@@ -1,4 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
+import GraficosDashboard from './GraficosDashboard'
+import ListasDashboard from './ListasDashboard'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -9,7 +11,7 @@ export default async function DashboardPage() {
     .select('*', { count: 'exact', head: true })
     .eq('status', 'Ativo')
 
-  // 2. Lógica Financeira
+  // 2. Lógica Financeira (Receita do Mês)
   const hoje = new Date()
   const primeiroDiaDoMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1).toISOString().split('T')[0]
 
@@ -22,7 +24,7 @@ export default async function DashboardPage() {
   const receitaTotal = mensalidadesPagas?.reduce((soma, item) => soma + Number(item.valor), 0) || 0
   const receitaFormatada = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(receitaTotal)
 
-  // 3. Estrutura de KPIs baseada na imagem de referência
+  // 3. KPIs
   const kpis = [
     { 
       label: 'Alunos Ativos', 
@@ -59,19 +61,32 @@ export default async function DashboardPage() {
   ]
 
   return (
-    <div className="space-y-8">
-      {/* Título da Página */}
-      <div>
-        <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Visão Geral</h1>
-        <p className="text-slate-500 mt-1">Acompanhe os principais indicadores da sua academia hoje.</p>
+    <div className="space-y-6">
+      
+      {/* Cabeçalho */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Visão Geral</h1>
+          <p className="text-slate-500 mt-1">Acompanhe os principais indicadores da sua academia hoje.</p>
+        </div>
+        
+        {/* Botões do Topo (Data e Novo Aluno) */}
+        <div className="flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-2 bg-white border border-slate-200 px-4 py-2.5 rounded-lg text-sm font-medium text-slate-700 shadow-sm">
+            <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+            11 de junho de 2025
+            <svg className="w-4 h-4 text-slate-400 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+          </div>
+          <a href="/alunos/novo" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors shadow-sm flex items-center gap-2">
+            <span>+</span> Novo aluno
+          </a>
+        </div>
       </div>
 
-      {/* Grid de KPIs (Cards) */}
+      {/* 1. Grid de KPIs (Cards) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {kpis.map((kpi) => (
           <div key={kpi.label} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition-shadow">
-            
-            {/* Topo do Card: Ícone + Textos */}
             <div className="flex items-start gap-4">
               <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${kpi.iconBg} ${kpi.iconColor}`}>
                 {kpi.icon}
@@ -81,8 +96,6 @@ export default async function DashboardPage() {
                 <p className="text-3xl font-bold text-slate-900 tracking-tight">{kpi.value}</p>
               </div>
             </div>
-
-            {/* Base do Card: Badge de Tendência e Rodapé */}
             <div className="mt-5 flex flex-col gap-3">
               <div>
                 <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold ${kpi.trendBg} ${kpi.trendColor}`}>
@@ -91,20 +104,15 @@ export default async function DashboardPage() {
               </div>
               <p className="text-xs text-slate-400 font-medium">{kpi.footerText}</p>
             </div>
-            
           </div>
         ))}
       </div>
 
-      {/* Espaço reservado para os Gráficos futuramente */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-slate-100 h-96 flex flex-col items-center justify-center text-slate-400 border-dashed">
-          <p className="font-medium">Gráfico de Resumo Financeiro (Em Breve)</p>
-        </div>
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 h-96 flex flex-col items-center justify-center text-slate-400 border-dashed">
-          <p className="font-medium">Gráfico de Check-ins (Em Breve)</p>
-        </div>
-      </div>
+      {/* 2. Gráficos (O componente que você criou) */}
+      <GraficosDashboard />
+
+      {/* 3. Listas Inferiores */}
+      <ListasDashboard />
 
     </div>
   )
