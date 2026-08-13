@@ -1,11 +1,10 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import BotaoExcluir from './BotaoExcluir' // Importamos o nosso novo botão!
 
 export default async function AlunosPage() {
-  // 1. Conecta com o Supabase
   const supabase = await createClient()
 
-  // 2. Busca os alunos REAIS no banco de dados, do mais novo pro mais velho
   const { data: alunos } = await supabase
     .from('alunos')
     .select('*')
@@ -53,9 +52,13 @@ export default async function AlunosPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                        <Link href={`/alunos/${aluno.id}`} className="text-blue-600 hover:text-blue-800 font-medium">
-                            Editar
-                        </Link>
+                      <Link href={`/alunos/${aluno.id}`} className="text-blue-600 hover:text-blue-800 font-medium">
+                        Editar
+                      </Link>
+                      
+                      {/* O botão aparece aqui do lado do Editar! */}
+                      <BotaoExcluir id={aluno.id} nome={aluno.nome} />
+                      
                     </td>
                   </tr>
                 ))
