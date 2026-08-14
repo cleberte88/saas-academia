@@ -24,7 +24,13 @@ export default async function DashboardPage() {
   const receitaTotal = mensalidadesPagas?.reduce((soma, item) => soma + Number(item.valor), 0) || 0
   const receitaFormatada = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(receitaTotal)
 
-  // 3. KPIs
+  // 3. NOVO: Busca total de Contratos a Vencer (Mensalidades Pendentes)
+  const { count: contratosAVencer } = await supabase
+    .from('mensalidades')
+    .select('*', { count: 'exact', head: true })
+    .eq('status', 'Pendente')
+
+  // 4. KPIs atualizados
   const kpis = [
     { 
       label: 'Alunos Ativos', 
@@ -51,12 +57,12 @@ export default async function DashboardPage() {
       trendBg: 'bg-purple-50', trendColor: 'text-purple-700', trendIcon: '↗', trendText: '8% vs mês anterior'
     },
     { 
-      label: 'Contratos a Vencer', 
-      value: '0', 
-      footerText: 'Em breve', 
+      label: 'Contratos em Atenção', 
+      value: contratosAVencer || 0, // <-- Agora usa o dado real do banco!
+      footerText: 'Cobranças pendentes', 
       icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>,
       iconBg: 'bg-rose-100', iconColor: 'text-rose-600',
-      trendBg: 'bg-rose-50', trendColor: 'text-rose-700', trendIcon: '↘', trendText: '0% vs mês anterior'
+      trendBg: 'bg-rose-50', trendColor: 'text-rose-700', trendIcon: '!', trendText: 'Atenção necessária'
     },
   ]
 
@@ -70,11 +76,11 @@ export default async function DashboardPage() {
           <p className="text-slate-500 mt-1">Acompanhe os principais indicadores da sua academia hoje.</p>
         </div>
         
-        {/* Botões do Topo (Data e Novo Aluno) */}
+        {/* Botões do Topo */}
         <div className="flex items-center gap-3">
           <div className="hidden md:flex items-center gap-2 bg-white border border-slate-200 px-4 py-2.5 rounded-lg text-sm font-medium text-slate-700 shadow-sm">
             <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-            11 de junho de 2025
+            14 de agosto de 2026
             <svg className="w-4 h-4 text-slate-400 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
           </div>
           <a href="/alunos/novo" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors shadow-sm flex items-center gap-2">
@@ -83,7 +89,7 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* 1. Grid de KPIs (Cards) */}
+      {/* 1. Grid de KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {kpis.map((kpi) => (
           <div key={kpi.label} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition-shadow">
@@ -108,7 +114,7 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      {/* 2. Gráficos (O componente que você criou) */}
+      {/* 2. Gráficos */}
       <GraficosDashboard />
 
       {/* 3. Listas Inferiores */}
