@@ -67,7 +67,8 @@ export default function LoginPage() {
           )}
 
           <button 
-            type="submit" 
+            type="button" 
+            onClick={handleLogin}
             disabled={loading} 
             className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 px-4 rounded-lg transition-colors disabled:opacity-70 disabled:cursor-not-allowed mt-2"
           >
