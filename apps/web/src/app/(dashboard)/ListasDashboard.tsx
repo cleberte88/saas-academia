@@ -73,32 +73,34 @@ export default async function ListasDashboard() {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
       
       {/* Coluna da Esquerda: Contratos em Atenção Detalhados */}
-      <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition-shadow">
+      <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition-shadow overflow-hidden">
         <h2 className="text-lg font-bold text-slate-900 mb-6">Contratos em Atenção Detalhados</h2>
         
-        <div className="overflow-x-auto flex-1">
-          <table className="w-full text-left border-collapse">
+        {/* Container com scroll horizontal garantido */}
+        <div className="overflow-x-auto flex-1 -mx-6 px-6 sm:mx-0 sm:px-0">
+          <table className="w-full text-left border-collapse min-w-[500px]">
             <thead>
               <tr className="border-b border-slate-100 text-xs text-slate-500 uppercase tracking-wider">
-                <th className="pb-3 font-medium">Aluno</th>
-                <th className="pb-3 font-medium">Plano</th>
-                <th className="pb-3 font-medium">Vencimento</th>
-                <th className="pb-3 font-medium">Status</th>
+                <th className="pb-3 font-medium whitespace-nowrap pr-4">Aluno</th>
+                <th className="pb-3 font-medium whitespace-nowrap pr-4">Plano</th>
+                <th className="pb-3 font-medium whitespace-nowrap pr-4">Vencimento</th>
+                <th className="pb-3 font-medium whitespace-nowrap">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50 text-sm">
               {contratos.length > 0 ? contratos.map((contrato) => (
                 <tr key={contrato.id}>
-                  <td className="py-4 flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs ${contrato.cor}`}>
+                  <td className="py-4 pr-4 whitespace-nowrap flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0 ${contrato.cor}`}>
                       {contrato.inicial}
                     </div>
                     <span className="font-medium text-slate-900">{contrato.nome}</span>
                   </td>
-                  <td className="py-4 text-slate-600 font-medium">{contrato.plano}</td>
-                  <td className="py-4 text-slate-900 font-medium">{contrato.vencimento}</td>
-                  <td className="py-4">
-                    <span className={`px-2.5 py-1 rounded text-xs font-semibold ${contrato.corStatus}`}>
+                  <td className="py-4 pr-4 whitespace-nowrap text-slate-600 font-medium">{contrato.plano}</td>
+                  <td className="py-4 pr-4 whitespace-nowrap text-slate-900 font-medium">{contrato.vencimento}</td>
+                  <td className="py-4 whitespace-nowrap">
+                    {/* A classe whitespace-nowrap aqui garante que o selo nunca vai quebrar! */}
+                    <span className={`inline-block px-2.5 py-1 rounded text-xs font-semibold whitespace-nowrap ${contrato.corStatus}`}>
                       {contrato.status}
                     </span>
                   </td>
