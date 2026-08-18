@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
-// Remova a importação do Link daqui, não precisamos mais nela.
 import { createClient } from '@/lib/supabase/server'
-import SidebarNav from './SidebarNav' // Importando o nosso menu inteligente!
+import SidebarNav from './SidebarNav'
+import MobileMenu from './MobileMenu' // 1. IMPORTAMOS O MENU MOBILE AQUI!
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -33,10 +33,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <strong className="text-xl font-bold text-slate-900 tracking-tight">SaaS Academias</strong>
         </div>
 
-        {/* CHAMAMOS O NOSSO COMPONENTE AQUI! */}
+        {/* Sidebar Nav */}
         <SidebarNav />
 
-        {/* Widget de Ajuda (Fixo no rodapé da Sidebar) */}
+        {/* Widget de Ajuda */}
         <div className="p-4 m-4 bg-slate-50 rounded-xl border border-slate-100 shrink-0">
           <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold mb-3">?</div>
           <p className="text-sm font-semibold text-slate-900">Precisa de ajuda?</p>
@@ -53,9 +53,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
         
         {/* Cabeçalho do Topo */}
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 lg:px-8 shrink-0 z-10">
-          <button className="md:hidden p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-lg">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
-          </button>
+          
+          {/* 2. AQUI ESTAVA O BOTÃO ESTÁTICO. SUBSTITUÍMOS PELO COMPONENTE REAL: */}
+          <MobileMenu />
 
           <div className="flex-1"></div>
 
