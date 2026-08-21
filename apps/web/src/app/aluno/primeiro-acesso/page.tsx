@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 
 export default function PrimeiroAcessoPage() {
   const router = useRouter()
@@ -14,13 +15,13 @@ export default function PrimeiroAcessoPage() {
     e.preventDefault()
     setErro('')
 
-    // Valida se as senhas coincidem
+    // 1. Valida se as senhas coincidem
     if (senha !== confirmaSenha) {
       setErro('As senhas não coincidem. Digite novamente.')
       return
     }
 
-    // Valida tamanho mínimo da senha
+    // 2. Valida o tamanho da senha
     if (senha.length < 6) {
       setErro('A senha precisa ter pelo menos 6 caracteres.')
       return
@@ -29,18 +30,34 @@ export default function PrimeiroAcessoPage() {
     setLoading(true)
 
     try {
-      // 🔴 AQUI ENTRARÁ A LÓGICA DO SUPABASE:
-      // 1. Atualizar a senha do usuário logado via supabase.auth.updateUser()
-      // 2. Atualizar a coluna "primeiro_acesso" para false na tabela alunos
+      // Inicia o cliente do Supabase
+      const supabase = createClient()
 
-      // Simulando o salvamento com sucesso
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      // 3. Atualiza a senha oficial do usuário no Supabase
+      const { error: authError } = await supabase.auth.updateUser({
+        password: senha
+      })
+
+      if (authError) throw authError
+
+      // 4. Pega os dados do usuário recém-atualizado para achar o e-mail dele
+      const { data: { user } } = await supabase.auth.getUser()
       
-      // Redireciona para a Home do Aluno
+      // 5. A CORREÇÃO: Avisa a tabela "alunos" que o primeiro acesso já foi feito
+      if (user && user.email) {
+        const { error: dbError } = await supabase
+          .from('alunos')
+          .update({ primeiro_acesso: false })
+          .eq('email', user.email)
+
+        if (dbError) throw dbError
+      }
+      
+      // 6. Sucesso! Libera o aluno para a tela inicial
       router.push('/aluno')
       
     } catch (error: any) {
-      setErro('Erro ao atualizar a senha. Tente novamente.')
+      setErro(error.message || 'Erro ao atualizar a senha. Tente novamente.')
       setLoading(false)
     }
   }
